@@ -7,7 +7,8 @@ require.config({
 	}
 });
 
-require(["Cell", "Field"], function(Cell, Field) {
+require(["Cell", "Field", "Draw"], function(Cell, Field, Draw) {
 	var field = new Field(10, 10);
-	console.log(field.cells);
+	var draw = new Draw("canvas");
+	draw.drawField(field, 0, 0);
 });

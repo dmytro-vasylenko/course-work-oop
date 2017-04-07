@@ -20,5 +20,19 @@ define([], function() {
 			this.context.lineTo(cell.x, cell.y);
 			this.context.stroke();
 		}
+
+		fillCell(x, y, color) {
+			this.context.fillStyle = color;
+			this.context.fillRect(x*CELL_WIDTH + 1, y*CELL_HEIGHT + 1, CELL_WIDTH - 2, CELL_HEIGHT - 2);
+		}
+
+		drawBoard(board) {
+			for(var i = 0; i < board.length; i++) {
+				if(board.orientation === "HORIZONTAL")
+					this.fillCell(board.x + i, board.y, "#cecece");
+				else if(board.orientation === "VERTICAL")
+					this.fillCell(board.x, board.y + i, "#cecece");
+			}
+		}
 	}
 });

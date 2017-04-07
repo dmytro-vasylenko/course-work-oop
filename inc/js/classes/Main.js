@@ -3,12 +3,19 @@ require.config({
 	paths: {
 		Cell: "Cell",
 		Field: "Field",
-		Draw: "Draw"
+		Draw: "Draw",
+		Player: "Player"
 	}
 });
 
-require(["Cell", "Field", "Draw"], function(Cell, Field, Draw) {
-	var field = new Field(10, 10);
-	var draw = new Draw("canvas");
-	draw.drawField(field, 0, 0);
+const CELL_WIDTH = 30;
+const CELL_HEIGHT = 30;
+
+require(["Player", "Board"], function(Player, Board) {
+	var player = new Player("Dmitry");
+	player.init();
+	var boardA = new Board(3, 3, 3, "HORIZONTAL");
+	var boardB = new Board(0, 0, 4, "VERTICAL");
+	player.addBoard(boardA);
+	player.addBoard(boardB);
 });

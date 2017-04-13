@@ -1,9 +1,13 @@
 define([], function() {
+
+	const BOARD_COLOR = "red";
+
 	return class Draw {
 		constructor(selector) {
 			this.selector = selector;
 			this.canvas = document.getElementById(this.selector);
 			this.context = this.canvas.getContext("2d");
+			this.visible = true;
 		}
 
 		drawField(field, x, y) {
@@ -21,17 +25,24 @@ define([], function() {
 			this.context.stroke();
 		}
 
+		drawMine(x, y, target = false) {
+			var img = document.getElementById(target ? "bomb-miss" : "bomb-on-target");
+			this.context.drawImage(img, x*CELL_WIDTH + 2, y*CELL_HEIGHT + 2, CELL_WIDTH - 4, CELL_HEIGHT - 4);
+		}
+
 		fillCell(x, y, color) {
 			this.context.fillStyle = color;
 			this.context.fillRect(x*CELL_WIDTH + 1, y*CELL_HEIGHT + 1, CELL_WIDTH - 2, CELL_HEIGHT - 2);
 		}
 
 		drawBoard(board) {
-			for(var i = 0; i < board.length; i++) {
-				if(board.orientation === "HORIZONTAL")
-					this.fillCell(board.x + i, board.y, "#cecece");
-				else if(board.orientation === "VERTICAL")
-					this.fillCell(board.x, board.y + i, "#cecece");
+			if(this.visible) {
+				for(var i = 0; i < board.length; i++) {
+					if(board.orientation === "H")
+						this.fillCell(board.x + i, board.y, BOARD_COLOR);
+					else if(board.orientation === "V")
+						this.fillCell(board.x, board.y + i, BOARD_COLOR);
+				}
 			}
 		}
 	}

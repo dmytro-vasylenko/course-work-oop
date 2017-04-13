@@ -6,5 +6,7 @@ define(["Draw"], function(Draw) {
 			this.length = length;
 			this.orientation = orientation;
 		}
+
+		// addToField(field) {}
 	}
 });

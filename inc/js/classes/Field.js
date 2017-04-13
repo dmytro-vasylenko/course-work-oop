@@ -12,5 +12,20 @@ define(["Cell"], function(Cell) {
 				this.cells.push(raw);
 			}
 		}
+
+		setCellsAround(x, y, data = "N") {
+			var steps = [
+				[-1, -1], [0, -1], [1, -1],
+				[-1, 0], [1, 0],
+				[-1, 1], [0, 1], [1, 1]
+			];
+
+			for(var i = 0; i < steps.length; i++) {
+				if(x + steps[i][0] < this.width && y + steps[i][1] < this.height
+					&& x + steps[i][0] >= 0 && y + steps[i][1] >= 0
+					&& this.cells[x + steps[i][0]][y + steps[i][1]].data != "B")
+					this.cells[x + steps[i][0]][y + steps[i][1]].data = data;
+			}
+		}
 	}
 });

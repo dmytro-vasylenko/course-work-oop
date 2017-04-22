@@ -1,30 +1,32 @@
-define(["Cell", "Board", "Draw", "Field"], function(Cell, Board, Draw, Field) {
+define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 	const MAX_BOARD_LENGTH = 4;
 
 	return class Player {
 		constructor(name, width, height, selector) {
 			this.name = name;
 			this.field = new Field(width, height);
-			this.draw = new Draw(selector);
-			this.boards = [];
+			this.canvas = document.getElementById(selector);
+			this.drawer = new Drawer(this.field, this.canvas);
+
+			document.getElementById(selector).addEventListener("mousedown", this.onFieldClick.bind(this), false);
 		}
 
 		init() {
-			this.draw.drawField(this.field);
+			this.drawer.drawField(this.field);
 		}
 
 		addBoard(board) {
-			this.boards.push(board);
-			this.draw.drawBoard(board);
+			this.field.boards.push(board);
+			this.drawer.drawBoard(board);
 
 			for(var i = 0; i < board.length; i++) {
 				if(board.orientation === "H") {
 					this.field.setCellsAround(board.x + i, board.y);
-					this.field.cells[board.x + i][board.y].data = "B";
+					this.field.cells[board.x + i][board.y] = "B";
 				}
 				else if(board.orientation === "V") {
 					this.field.setCellsAround(board.x, board.y + i);
-					this.field.cells[board.x][board.y + i].data = "B";
+					this.field.cells[board.x][board.y + i] = "B";
 				}
 			}
 		}
@@ -51,9 +53,9 @@ define(["Cell", "Board", "Draw", "Field"], function(Cell, Board, Draw, Field) {
 			var counter = 0;
 			for(var i = 0; i < this.field.cells.length; i++) {
 				for(var j = 0; j < this.field.cells[i].length; j++) {
-					if(this.field.cells[j][i].data === "B")
+					if(this.field.cells[j][i] === "B")
 						counter++;
-					result += (this.field.cells[j][i].data === null ? "." : this.field.cells[j][i].data)  + " ";
+					result += (this.field.cells[j][i] === null ? "." : this.field.cells[j][i])  + " ";
 				}
 				result += "\n";
 			}
@@ -64,8 +66,8 @@ define(["Cell", "Board", "Draw", "Field"], function(Cell, Board, Draw, Field) {
 		canAddBoard(board) {
 
 			if(board.length === 1) {
-				if(this.field.cells[board.x][board.y].data === "N"
-					|| this.field.cells[board.x][board.y].data === "B")
+				if(this.field.cells[board.x][board.y] === "N"
+					|| this.field.cells[board.x][board.y] === "B")
 					return false;
 
 				return true;
@@ -76,8 +78,8 @@ define(["Cell", "Board", "Draw", "Field"], function(Cell, Board, Draw, Field) {
 					return false;
 
 				for(var i = 0; i < board.length; i++)
-					if(this.field.cells[board.x + i][board.y].data === "N"
-						|| this.field.cells[board.x + i][board.y].data === "B")
+					if(this.field.cells[board.x + i][board.y] === "N"
+						|| this.field.cells[board.x + i][board.y] === "B")
 						return false;
 			}
 			else if(board.orientation === "V") {
@@ -85,13 +87,56 @@ define(["Cell", "Board", "Draw", "Field"], function(Cell, Board, Draw, Field) {
 					return false;
 
 				for(var i = 0; i < board.length; i++) {
-					if(this.field.cells[board.x][board.y + i].data === "N"
-						|| this.field.cells[board.x][board.y + i].data == "B")
+					if(this.field.cells[board.x][board.y + i] === "N"
+						|| this.field.cells[board.x][board.y + i] == "B")
 						return false;
 				}
 			}
 
 			return true;
+		}
+
+		onFieldClick(event) {
+			var x = event.x - this.canvas.offsetLeft;
+			var y = event.y - this.canvas.offsetTop;
+
+			var cellX = Math.floor(x / this.drawer.cellWidth);
+			var cellY = Math.floor(y / this.drawer.cellHeight);
+			if(!this.field.isBomb(cellX, cellY)) {
+				if(this.field.cells[cellX][cellY] == "B") {
+					this.drawer.drawMine(cellX, cellY);
+					var board = this.field.findBoard(cellX, cellY);
+					board.lives--;
+					if(!board.lives) {
+						var steps = [
+							[-1, -1], [0, -1], [1, -1],
+							[-1, 0], [1, 0],
+							[-1, 1], [0, 1], [1, 1]
+						];
+						var k = [];
+						if(board.orientation == "H")
+							k = [1, 0];
+						else if(board.orientation == "V")
+							k = [0, 1];
+
+						for(var l = 0; l < board.length; l++) {
+							for(var i = 0; i < steps.length; i++) {
+								if(board.x + steps[i][0] + l*k[0] >= 0 && board.y + steps[i][1] + l*k[1] >= 0 &&
+									board.x + steps[i][0] + l*k[0] < this.field.width && board.y + steps[i][1] + l*k[1] < this.field.width &&
+									this.field.cells[board.x + steps[i][0] + l*k[0]][board.y + steps[i][1] + l*k[1]] == "N") {
+									this.drawer.drawMine(board.x + steps[i][0] + l*k[0], board.y + steps[i][1] + l*k[1], true);
+								}
+							}
+						}
+					}
+				} else {
+					this.drawer.drawMine(cellX, cellY, true);
+				}
+			}
+		}
+
+		attackBot() {
+
 		}
 	}
 });

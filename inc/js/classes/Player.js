@@ -53,7 +53,7 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 			var counter = 0;
 			for(var i = 0; i < this.field.cells.length; i++) {
 				for(var j = 0; j < this.field.cells[i].length; j++) {
-					if(this.field.cells[j][i] === "B")
+					if(this.field.is(i, j, "B"))
 						counter++;
 					result += (this.field.cells[j][i] === null ? "." : this.field.cells[j][i])  + " ";
 				}
@@ -66,8 +66,8 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 		canAddBoard(board) {
 
 			if(board.length === 1) {
-				if(this.field.cells[board.x][board.y] === "N"
-					|| this.field.cells[board.x][board.y] === "B")
+				if(this.field.is(board.x, board.y, "N")
+					|| this.field.is(board.x, board.y, "B"))
 					return false;
 
 				return true;
@@ -78,8 +78,8 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 					return false;
 
 				for(var i = 0; i < board.length; i++)
-					if(this.field.cells[board.x + i][board.y] === "N"
-						|| this.field.cells[board.x + i][board.y] === "B")
+					if(this.field.is(board.x + i, board.y, "N")
+						|| this.field.is(board.x + i, board.y, "B"))
 						return false;
 			}
 			else if(board.orientation === "V") {
@@ -87,8 +87,8 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 					return false;
 
 				for(var i = 0; i < board.length; i++) {
-					if(this.field.cells[board.x][board.y + i] === "N"
-						|| this.field.cells[board.x][board.y + i] == "B")
+					if(this.field.is(board.x, board.y + i, "N")
+						|| this.field.is(board.x, board.y + i, "B"))
 						return false;
 				}
 			}
@@ -102,8 +102,8 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 
 			var cellX = Math.floor(x / this.drawer.cellWidth);
 			var cellY = Math.floor(y / this.drawer.cellHeight);
-			if(!this.field.isBomb(cellX, cellY)) {
-				if(this.field.cells[cellX][cellY] == "B") {
+			if(!this.field.is(cellX, cellY, "X")) {
+				if(this.field.is(cellX, cellY, "B")) {
 					this.drawer.drawMine(cellX, cellY);
 					var board = this.field.findBoard(cellX, cellY);
 					board.lives--;
@@ -123,7 +123,7 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 							for(var i = 0; i < steps.length; i++) {
 								if(board.x + steps[i][0] + l*k[0] >= 0 && board.y + steps[i][1] + l*k[1] >= 0 &&
 									board.x + steps[i][0] + l*k[0] < this.field.width && board.y + steps[i][1] + l*k[1] < this.field.width &&
-									this.field.cells[board.x + steps[i][0] + l*k[0]][board.y + steps[i][1] + l*k[1]] == "N") {
+									this.field.is(board.x + steps[i][0] + l*k[0], board.y + steps[i][1] + l*k[1], "N")) {
 									this.drawer.drawMine(board.x + steps[i][0] + l*k[0], board.y + steps[i][1] + l*k[1], true);
 								}
 							}

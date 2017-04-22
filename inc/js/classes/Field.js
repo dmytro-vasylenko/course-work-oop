@@ -29,7 +29,7 @@ define([], function() {
 			}
 		}
 
-		isBomb(x, y, param) {
+		is(x, y, param) {
 			if(this.cells[x][y] == param)
 				return true;
 

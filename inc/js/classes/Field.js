@@ -1,9 +1,9 @@
 define([], function() {
-	return class {
+	return class Field {
 		constructor(width, height) {
 			this.width = width;
 			this.height = height;
-			this.boards = []
+			this.boats = []
 			this.cells = [];
 			for(var i = 0; i < this.height; i++) {
 				var raw = [];
@@ -24,28 +24,35 @@ define([], function() {
 			for(var i = 0; i < steps.length; i++) {
 				if(x + steps[i][0] < this.width && y + steps[i][1] < this.height
 					&& x + steps[i][0] >= 0 && y + steps[i][1] >= 0
-					&& this.cells[x + steps[i][0]][y + steps[i][1]] != "B")
+					&& !this.is(x + steps[i][0], y + steps[i][1], "B"))
 						this.cells[x + steps[i][0]][y + steps[i][1]] = data;
 			}
 		}
 
 		is(x, y, param) {
-			if(this.cells[x][y] == param)
+			if(this.cells[x][y] != null && this.cells[x][y].indexOf(param) != -1)
 				return true;
 
 			return false;
 		}
 
-		findBoard(x, y) {
-			for(var b = 0; b < this.boards.length; b++) {
-				if(this.boards[b].x == x && this.boards[b].y == y) {
-					return this.boards[b];
+		findBoat(x, y) {
+			for(var i = 0; i < this.boats.length; i++) {
+				if(this.boats[i].x == x && this.boats[i].y == y) {
+					return this.boats[i];
 				}
 			}
-			if(x - 1 >= 0 && this.cells[x - 1][y] == "B")
-				return this.findBoard(x - 1, y);
-			else if(y - 1 >= 0 && this.cells[x][y - 1] == "B")
-				return this.findBoard(x, y - 1);
+			if(x - 1 >= 0 && this.is(x - 1, y, "B"))
+				return this.findBoat(x - 1, y);
+			else if(y - 1 >= 0 && this.is(x, y - 1, "B"))
+				return this.findBoat(x, y - 1);
+		}
+
+		deleteBoat(boat) {
+			for(var i = 0; i < this.boats.length; i++) {
+				if(this.boats[i] == boat)
+					this.boats.splice(i, 1);
+			}
 		}
 	}
 });

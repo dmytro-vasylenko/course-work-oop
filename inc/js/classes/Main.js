@@ -4,18 +4,31 @@ require.config({
 		Cell: "Cell",
 		Field: "Field",
 		Drawer: "Drawer",
-		Player: "Player"
+		Player: "Player",
+		Boat: "Boat",
+		AI: "AI"
 	}
 });
 
-require(["Player", "Board"], function(Player, Board) {
-	var player = new Player("Dmitry", 10, 10, "canvas-player");
+require(["Player", "Boat"], function(Player, Boat) {
+	var player = new Player("Dmitry", 10, 10, null, "canvas-player");
 	player.init();
 	player.canAttacked = false;
-	player.generateBoards();
+	player.generateBoats();
+	player.giveAI();
 
-	var enemy = new Player("Enemy", 10, 10, "canvas-enemy");
+	// var observer = {
+	// 	onFieldClick: function() {
+	// 		player.botAttack(player);
+	// 	}
+	// };
+
+	var enemy = new Player("Enemy", 10, 10, {
+		onFieldClick: function() {
+			player.botAttack();
+		}
+	}, "canvas-enemy");
 	enemy.init();
-	enemy.drawer.visible = false;
-	enemy.generateBoards();
+	// enemy.drawer.visible = false;
+	enemy.generateBoats();
 });

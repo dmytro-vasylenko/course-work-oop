@@ -1,6 +1,6 @@
 define([], function() {
 
-	const BOARD_COLOR = "red";
+	const BOARD_COLOR = "#110000";
 
 	return class Draw {
 		constructor(field, canvas) {
@@ -37,13 +37,13 @@ define([], function() {
 			this.context.fillRect(x*this.cellWidth + 1, y*this.cellHeight + 1, this.cellWidth - 2, this.cellHeight - 2);
 		}
 
-		drawBoard(board) {
+		drawBoat(boat) {
 			if(this.visible) {
-				for(var i = 0; i < board.length; i++) {
-					if(board.orientation === "H")
-						this.fillCell(board.x + i, board.y, BOARD_COLOR);
-					else if(board.orientation === "V")
-						this.fillCell(board.x, board.y + i, BOARD_COLOR);
+				for(var i = 0; i < boat.length; i++) {
+					if(boat.orientation === "H")
+						this.fillCell(boat.x + i, boat.y, BOARD_COLOR);
+					else if(boat.orientation === "V")
+						this.fillCell(boat.x, boat.y + i, BOARD_COLOR);
 				}
 			}
 		}

@@ -1,12 +1,14 @@
-define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
-	const MAX_BOARD_LENGTH = 4;
+define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
+	const MAX_BOAT_LENGTH = 4;
 
 	return class Player {
-		constructor(name, width, height, selector) {
+		constructor(name, width, height, observer, selector) {
 			this.name = name;
+			this.observer = observer;
 			this.field = new Field(width, height);
 			this.canvas = document.getElementById(selector);
 			this.drawer = new Drawer(this.field, this.canvas);
+			this.canAttacked = true;
 
 			document.getElementById(selector).addEventListener("mousedown", this.onFieldClick.bind(this), false);
 		}
@@ -15,32 +17,32 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 			this.drawer.drawField(this.field);
 		}
 
-		addBoard(board) {
-			this.field.boards.push(board);
-			this.drawer.drawBoard(board);
+		addBoard(boat) {
+			this.field.boats.push(boat);
+			this.drawer.drawBoat(boat);
 
-			for(var i = 0; i < board.length; i++) {
-				if(board.orientation === "H") {
-					this.field.setCellsAround(board.x + i, board.y);
-					this.field.cells[board.x + i][board.y] = "B";
+			for(var i = 0; i < boat.length; i++) {
+				if(boat.orientation === "H") {
+					this.field.setCellsAround(boat.x + i, boat.y);
+					this.field.cells[boat.x + i][boat.y] = "B";
 				}
-				else if(board.orientation === "V") {
-					this.field.setCellsAround(board.x, board.y + i);
-					this.field.cells[board.x][board.y + i] = "B";
+				else if(boat.orientation === "V") {
+					this.field.setCellsAround(boat.x, boat.y + i);
+					this.field.cells[boat.x][boat.y + i] = "B";
 				}
 			}
 		}
 
-		generateBoards() {
-			for(var length = 1; length <= MAX_BOARD_LENGTH; length++) {
-				for(var number = MAX_BOARD_LENGTH - length + 1; number > 0; number--) {
+		generateBoats() {
+			for(var length = 1; length <= MAX_BOAT_LENGTH; length++) {
+				for(var number = MAX_BOAT_LENGTH - length + 1; number > 0; number--) {
 					while(true) {
 						var x = Math.round(Math.random() * (this.field.width - 1));
 						var y = Math.round(Math.random() * (this.field.height - 1));
 						var orientation = Math.round(Math.random() * 2) % 2 === 1 ? "H" : "V";
-						var board = new Board(x, y, length, orientation);
-						if(this.canAddBoard(board)) {
-							this.addBoard(board);
+						var boat = new Boat(x, y, length, orientation);
+						if(this.canAddBoard(boat)) {
+							this.addBoard(boat);
 							break;
 						}
 					}
@@ -55,7 +57,7 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 				for(var j = 0; j < this.field.cells[i].length; j++) {
 					if(this.field.is(i, j, "B"))
 						counter++;
-					result += (this.field.cells[j][i] === null ? "." : this.field.cells[j][i])  + " ";
+					result += (this.field.is(j, i, "X") ? "X" : ".") + "\t";
 				}
 				result += "\n";
 			}
@@ -63,32 +65,32 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 			console.log(result, counter);
 		}
 
-		canAddBoard(board) {
+		canAddBoard(boat) {
 
-			if(board.length === 1) {
-				if(this.field.is(board.x, board.y, "N")
-					|| this.field.is(board.x, board.y, "B"))
+			if(boat.length === 1) {
+				if(this.field.is(boat.x, boat.y, "N") ||
+					this.field.is(boat.x, boat.y, "B"))
 					return false;
 
 				return true;
 			}
 
-			if(board.orientation === "H") {
-				if(board.x + board.length > this.field.width)
+			if(boat.orientation === "H") {
+				if(boat.x + boat.length > this.field.width)
 					return false;
 
-				for(var i = 0; i < board.length; i++)
-					if(this.field.is(board.x + i, board.y, "N")
-						|| this.field.is(board.x + i, board.y, "B"))
+				for(var i = 0; i < boat.length; i++)
+					if(this.field.is(boat.x + i, boat.y, "N") ||
+						this.field.is(boat.x + i, boat.y, "B"))
 						return false;
 			}
-			else if(board.orientation === "V") {
-				if(board.y + board.length > this.field.height)
+			else if(boat.orientation === "V") {
+				if(boat.y + boat.length > this.field.height)
 					return false;
 
-				for(var i = 0; i < board.length; i++) {
-					if(this.field.is(board.x, board.y + i, "N")
-						|| this.field.is(board.x, board.y + i, "B"))
+				for(var i = 0; i < boat.length; i++) {
+					if(this.field.is(boat.x, boat.y + i, "N") ||
+						this.field.is(boat.x, boat.y + i, "B"))
 						return false;
 				}
 			}
@@ -97,46 +99,79 @@ define(["Board", "Drawer", "Field"], function(Board, Drawer, Field) {
 		}
 
 		onFieldClick(event) {
-			var x = event.x - this.canvas.offsetLeft;
-			var y = event.y - this.canvas.offsetTop;
+			if(this.canAttacked) {
+				var x = event.x - this.canvas.offsetLeft;
+				var y = event.y - this.canvas.offsetTop;
 
-			var cellX = Math.floor(x / this.drawer.cellWidth);
-			var cellY = Math.floor(y / this.drawer.cellHeight);
-			if(!this.field.is(cellX, cellY, "X")) {
-				if(this.field.is(cellX, cellY, "B")) {
-					this.drawer.drawMine(cellX, cellY);
-					var board = this.field.findBoard(cellX, cellY);
-					board.lives--;
-					if(!board.lives) {
+				var cellX = Math.floor(x / this.drawer.cellWidth);
+				var cellY = Math.floor(y / this.drawer.cellHeight);
+				
+				this.attack(cellX, cellY);
+			}
+		}
+
+		attack(x, y) {
+			var hit = false;
+			if(!this.field.is(x, y, "X")) {
+				this.field.cells[x][y] = this.field.cells[x][y] ? this.field.cells[x][y] + "X" : "X";
+				if(this.field.is(x, y, "B")) {
+					hit = true;
+					this.drawer.drawMine(x, y);
+					var boat = this.field.findBoat(x, y);
+					boat.lives--;
+					if(!boat.lives) {
+						this.field.deleteBoat(boat);
 						var steps = [
 							[-1, -1], [0, -1], [1, -1],
 							[-1, 0], [1, 0],
 							[-1, 1], [0, 1], [1, 1]
 						];
 						var k = [];
-						if(board.orientation == "H")
+						if(boat.orientation == "H")
 							k = [1, 0];
-						else if(board.orientation == "V")
+						else if(boat.orientation == "V")
 							k = [0, 1];
 
-						for(var l = 0; l < board.length; l++) {
+						for(var l = 0; l < boat.length; l++) {
 							for(var i = 0; i < steps.length; i++) {
-								if(board.x + steps[i][0] + l*k[0] >= 0 && board.y + steps[i][1] + l*k[1] >= 0 &&
-									board.x + steps[i][0] + l*k[0] < this.field.width && board.y + steps[i][1] + l*k[1] < this.field.width &&
-									this.field.is(board.x + steps[i][0] + l*k[0], board.y + steps[i][1] + l*k[1], "N")) {
-									this.drawer.drawMine(board.x + steps[i][0] + l*k[0], board.y + steps[i][1] + l*k[1], true);
+								if(boat.x + steps[i][0] + l*k[0] >= 0 &&
+								   boat.y + steps[i][1] + l*k[1] >= 0 &&
+								   boat.x + steps[i][0] + l*k[0] < this.field.width &&
+								   boat.y + steps[i][1] + l*k[1] < this.field.height &&
+								   this.field.is(boat.x + steps[i][0] + l*k[0], boat.y + steps[i][1] + l*k[1], "N")) {
+
+									this.drawer.drawMine(boat.x + steps[i][0] + l*k[0], boat.y + steps[i][1] + l*k[1], true);
+									this.field.cells[boat.x + steps[i][0] + l*k[0]][boat.y + steps[i][1] + l*k[1]] += "X";
 								}
 							}
 						}
 					}
+					if(this.checkWin()) {
+						alert(this.name + " LOST!!");
+					}
 				} else {
-					this.drawer.drawMine(cellX, cellY, true);
+					this.drawer.drawMine(x, y, true);
 				}
+				if(this.observer && !hit)
+					this.observer.onFieldClick();
 			}
 		}
 
-		attackBot() {
+		checkWin() {
+			if(!this.field.boats.length)
+				return true;
 
+			return false;
 		}
-	}
+
+		giveAI() {
+			this.AI = new AI({
+				player: this
+			});
+		}
+
+		botAttack() {
+			this.AI.attack();
+		}
+	};
 });

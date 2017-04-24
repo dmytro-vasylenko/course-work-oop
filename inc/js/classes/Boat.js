@@ -1,5 +1,5 @@
 define([], function() {
-	return class Board {
+	return class Boat {
 		constructor(x, y, length, orientation) {
 			this.x = x;
 			this.y = y;
@@ -7,7 +7,5 @@ define([], function() {
 			this.lives = length;
 			this.orientation = orientation;
 		}
-
-		// addToField(field) {}
 	}
 });

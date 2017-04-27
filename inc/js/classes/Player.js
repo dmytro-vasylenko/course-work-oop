@@ -34,7 +34,7 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 		}
 
 		generateBoats() {
-			for(var length = 1; length <= MAX_BOAT_LENGTH; length++) {
+			for(var length = MAX_BOAT_LENGTH; length > 0; length--) {
 				for(var number = MAX_BOAT_LENGTH - length + 1; number > 0; number--) {
 					while(true) {
 						var x = Math.round(Math.random() * (this.field.width - 1));

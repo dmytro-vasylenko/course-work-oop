@@ -15,6 +15,8 @@ function sleep(ms) {
 	while(new Date() < ms){}
 }
 
+var gameState = true;
+
 require(["Player", "Boat"], function(Player, Boat) {
 	var player = new Player("Dmitry", 10, 10, null, "canvas-player");
 	player.init();

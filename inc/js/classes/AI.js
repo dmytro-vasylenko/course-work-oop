@@ -24,8 +24,6 @@ define([], function() {
 					var y = Math.floor(Math.random() * this.player.field.height);
 				} while(this.player.field.is(x, y, "X"));
 				this.attackCell(x, y);
-				console.log({x, y, cell: this.player.field.cells[x][y]});
-				this.player.printField();
 				if(this.player.field.is(x, y, "B")) {
 					if(!this.player.field.findBoat(x, y)) {
 						this.attack();
@@ -124,6 +122,10 @@ define([], function() {
 
 		attackCell(x, y) {
 			this.player.attack(x, y);
+		}
+
+		getAreaLength(x, y) {
+
 		}
 	};
 });

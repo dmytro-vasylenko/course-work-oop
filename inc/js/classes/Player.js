@@ -46,8 +46,10 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 							break;
 						}
 					}
+					// alert(this.printField());
 				}
 			}
+			// alert("OK");
 		}
 
 		printField() {
@@ -57,12 +59,12 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 				for(var j = 0; j < this.field.cells[i].length; j++) {
 					if(this.field.is(i, j, "B"))
 						counter++;
-					result += (this.field.is(j, i, "X") ? "X" : ".") + "\t";
+					result += (this.field.cells[i][j] ? this.field.cells[i][j] + "  " : ".    ");
 				}
 				result += "\n";
 			}
 
-			console.log(result, counter);
+			return result;
 		}
 
 		canAddBoard(boat) {
@@ -100,8 +102,9 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 		onFieldClick(event) {
 			if(this.canAttacked) {
-				var x = event.x - this.canvas.offsetLeft;
-				var y = event.y - this.canvas.offsetTop;
+				var x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
+				var y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
+				console.log({x, y});
 
 				var cellX = Math.floor(x / this.drawer.cellWidth);
 				var cellY = Math.floor(y / this.drawer.cellHeight);
@@ -134,14 +137,13 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 						for(var l = 0; l < boat.length; l++) {
 							for(var i = 0; i < steps.length; i++) {
-								if(boat.x + steps[i][0] + l*k[0] >= 0 &&
-								   boat.y + steps[i][1] + l*k[1] >= 0 &&
-								   boat.x + steps[i][0] + l*k[0] < this.field.width &&
-								   boat.y + steps[i][1] + l*k[1] < this.field.height &&
-								   this.field.is(boat.x + steps[i][0] + l*k[0], boat.y + steps[i][1] + l*k[1], "N")) {
+								var x = boat.x + steps[i][0] + l*k[0];
+								var y = boat.y + steps[i][1] + l*k[1];
+								if(x >= 0 && y >= 0 && x < this.field.width && y < this.field.height &&
+									this.field.is(x, y, "N") && !this.field.is(x, y, "X")) {
 
-									this.drawer.drawMine(boat.x + steps[i][0] + l*k[0], boat.y + steps[i][1] + l*k[1], true);
-									this.field.cells[boat.x + steps[i][0] + l*k[0]][boat.y + steps[i][1] + l*k[1]] += "X";
+									this.drawer.drawMine(x, y, true);
+									this.field.cells[x][y] += "X";
 								}
 							}
 						}
@@ -153,7 +155,10 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 					this.drawer.drawMine(x, y, true);
 				}
 				if(this.observer && !hit)
+				{
+					this.printField();
 					this.observer.onFieldClick();
+				}
 			}
 		}
 

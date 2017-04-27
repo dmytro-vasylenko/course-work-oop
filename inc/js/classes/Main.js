@@ -10,6 +10,11 @@ require.config({
 	}
 });
 
+function sleep(ms) {
+	ms += new Date().getTime();
+	while(new Date() < ms){}
+}
+
 require(["Player", "Boat"], function(Player, Boat) {
 	var player = new Player("Dmitry", 10, 10, null, "canvas-player");
 	player.init();
@@ -29,6 +34,6 @@ require(["Player", "Boat"], function(Player, Boat) {
 		}
 	}, "canvas-enemy");
 	enemy.init();
-	// enemy.drawer.visible = false;
+	enemy.drawer.visible = false;
 	enemy.generateBoats();
 });

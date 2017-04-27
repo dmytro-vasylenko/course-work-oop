@@ -1,8 +1,8 @@
 define([], function() {
 
-	const BOARD_COLOR = "#110000";
+	const BOARD_COLOR = "rgba(0, 0, 255, 0.7)";
 
-	return class Draw {
+	return class Drawer {
 		constructor(field, canvas) {
 			this.field = field;
 			this.canvas = canvas;
@@ -15,6 +15,7 @@ define([], function() {
 		}
 
 		drawField(x, y) {
+			
 			for(var x = 0; x <= this.fieldWidth; x += this.cellWidth){
 				this.context.moveTo(x, 0);
 				this.context.lineTo(x, this.fieldHeight);
@@ -28,8 +29,13 @@ define([], function() {
 		}
 
 		drawMine(x, y, target = false) {
-			var img = document.getElementById(target ? "bomb-miss" : "bomb-on-target");
-			this.context.drawImage(img, x*this.cellWidth + 2, y*this.cellHeight + 2, this.cellWidth - 4, this.cellHeight - 4);
+			if(target) {
+				var img = document.getElementById("bomb-miss");
+				this.context.drawImage(img, x*this.cellWidth + this.cellWidth/4, y*this.cellHeight + this.cellHeight/4, this.cellWidth/2, this.cellHeight/2);
+			} else {
+				var img = document.getElementById("bomb-on-target");
+				this.context.drawImage(img, x*this.cellWidth + 2, y*this.cellHeight + 2, this.cellWidth - 4, this.cellHeight - 4);
+			}
 		}
 
 		fillCell(x, y, color) {

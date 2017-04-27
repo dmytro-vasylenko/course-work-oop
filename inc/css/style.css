@@ -1,0 +1,2 @@
+*{margin:0;padding:0}body{background:url(../img/background.png)}#playground{width:615px;height:300px;position:absolute;left:0;right:0;margin:auto;top:0;bottom:0}#playground canvas{border:1px solid #000;box-shadow:0 0 10px grey;background:rgba(255,255,255,0.3);float:left}#playground #canvas-player{margin-right:10px}img{display:none}@media all and (max-width: 630px){#playground{width:300px;height:610px}#playground canvas{margin-bottom:10px}}
+/*# sourceMappingURL=style.css.map */

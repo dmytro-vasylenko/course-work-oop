@@ -10,12 +10,11 @@ define([], function() {
 			this.visible = true;
 			this.fieldWidth = this.canvas.width;
 			this.fieldHeight = this.canvas.height;
-			this.cellWidth = 300/this.field.width;
-			this.cellHeight = 300/this.field.height;
+			this.cellWidth = this.fieldWidth/this.field.width;
+			this.cellHeight = this.fieldHeight/this.field.height;
 		}
 
-		drawField(x, y) {
-			
+		drawField() {
 			for(var x = 0; x <= this.fieldWidth; x += this.cellWidth){
 				this.context.moveTo(x, 0);
 				this.context.lineTo(x, this.fieldHeight);
@@ -52,6 +51,10 @@ define([], function() {
 						this.fillCell(boat.x, boat.y + i, BOARD_COLOR);
 				}
 			}
+		}
+
+		clearField() {
+			this.context.clearRect(0, 0, this.fieldWidth, this.fieldHeight);
 		}
 	}
 });

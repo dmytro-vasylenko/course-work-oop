@@ -10,27 +10,43 @@ require.config({
 	}
 });
 
-document.getElementById("bot-button").addEventListener("click", function() {
-	document.getElementById("window").className += " fadeOut";
-	document.getElementById("canvas-player").className += " fadeInLeft";
-	document.getElementById("canvas-enemy").className += " fadeInRight";
-	document.getElementById("window").style.zIndex = -10000;
-});
-
 require(["Player", "Boat"], function(Player, Boat) {
-	var player = new Player("Dmitry", 10, 10, null, "canvas-player");
-	player.init();
-	player.canAttacked = false;
-	player.generateBoats();
-	player.giveAI();
 
-	var enemy = new Player("Enemy", 10, 10, {
-		onFieldClick: function() {
-			player.botAttack();
-		}
-	}, "canvas-enemy");
+	var player;
+	var enemy;
 
-	enemy.init();
-	enemy.drawer.visible = false;
-	enemy.generateBoats();
+
+	$("#bot-button").on("click", function() {
+		$("#window-welcome").addClass("fadeOut");
+		$("#canvas-player").addClass("fadeInLeft");
+		$("#canvas-enemy").addClass("fadeInRight");
+		$("#window-welcome").css({zIndex: -1000});
+
+		player = new Player($("#window-welcome input").val(), 10, 10, null, "canvas-player");
+		player.init();
+		player.canAttacked = false;
+		player.generateBoats();
+		player.giveAI();
+
+		enemy = new Player("Враг", 10, 10, {
+			onFieldClick: function() {
+				player.botAttack();
+			},
+			loss: function() {
+				player.canAttacked = false;
+			}
+		}, "canvas-enemy");
+
+		enemy.init();
+		enemy.drawer.visible = false;
+		enemy.generateBoats();
+	});
+	$("#reset-game").on("click", function() {
+		player.reset();
+		player.canAttacked = false;
+		enemy.reset();
+		$("#window-win").removeClass("fadeInDown");
+		$("#window-win").addClass("fadeOut");
+		$("#window-win").css({zIndex: -1000});
+	});
 });

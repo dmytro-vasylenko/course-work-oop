@@ -14,7 +14,7 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 		}
 
 		init() {
-			this.drawer.drawField(this.field);
+			this.drawer.drawField();
 		}
 
 		addBoard(boat) {
@@ -46,10 +46,8 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 							break;
 						}
 					}
-					// alert(this.printField());
 				}
 			}
-			// alert("OK");
 		}
 
 		printField() {
@@ -104,11 +102,12 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			if(this.canAttacked) {
 				var x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
 				var y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
-				console.log({x, y});
-
+				if(x >= this.canvas.width)
+					x = this.canvas.width - 1;
+				if(y >= this.canvas.height)
+					y = this.canvas.height - 1;
 				var cellX = Math.floor(x / this.drawer.cellWidth);
 				var cellY = Math.floor(y / this.drawer.cellHeight);
-				
 				this.attack(cellX, cellY);
 			}
 		}
@@ -148,21 +147,28 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 							}
 						}
 					}
-					if(this.checkWin()) {
-						alert(this.name + " LOST!!");
+					if(this.checkLose()) {
+						if(this.AI)
+							this.AI.game = false;
+						if(this.observer)
+							this.observer.loss();
+						this.canAttacked = false;
+						$("#window-win b").text(this.name);
+						$("#window-win").css({zIndex: 100});
+						$("#window-win").removeClass("fadeOut");
+						$("#window-win").addClass("fadeInDown");
 					}
 				} else {
 					this.drawer.drawMine(x, y, true);
 				}
 				if(this.observer && !hit)
 				{
-					this.printField();
 					this.observer.onFieldClick();
 				}
 			}
 		}
 
-		checkWin() {
+		checkLose() {
 			if(!this.field.boats.length)
 				return true;
 
@@ -177,6 +183,18 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 		botAttack() {
 			this.AI.attack();
+		}
+
+		reset() {
+			this.canAttacked = true;
+			this.drawer.clearField();
+			this.field.clearCells();
+			this.field.clearBoats();
+			this.drawer.drawField();
+			this.AI = new AI({
+				player: this
+			});
+			this.generateBoats();
 		}
 	};
 });

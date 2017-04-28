@@ -54,5 +54,20 @@ define([], function() {
 					this.boats.splice(i, 1);
 			}
 		}
+
+		clearCells() {
+			this.cells = [];
+			for(var i = 0; i < this.height; i++) {
+				var raw = [];
+				for(var j = 0; j < this.width; j++) {
+					raw.push(null);
+				}
+				this.cells.push(raw);
+			}
+		}
+
+		clearBoats() {
+			this.boats = [];
+		}
 	}
 });

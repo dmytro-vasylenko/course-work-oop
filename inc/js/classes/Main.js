@@ -10,12 +10,12 @@ require.config({
 	}
 });
 
-function sleep(ms) {
-	ms += new Date().getTime();
-	while(new Date() < ms){}
-}
-
-var gameState = true;
+document.getElementById("bot-button").addEventListener("click", function() {
+	document.getElementById("window").className += " fadeOut";
+	document.getElementById("canvas-player").className += " fadeInLeft";
+	document.getElementById("canvas-enemy").className += " fadeInRight";
+	document.getElementById("window").style.zIndex = -10000;
+});
 
 require(["Player", "Boat"], function(Player, Boat) {
 	var player = new Player("Dmitry", 10, 10, null, "canvas-player");
@@ -24,17 +24,12 @@ require(["Player", "Boat"], function(Player, Boat) {
 	player.generateBoats();
 	player.giveAI();
 
-	// var observer = {
-	// 	onFieldClick: function() {
-	// 		player.botAttack(player);
-	// 	}
-	// };
-
 	var enemy = new Player("Enemy", 10, 10, {
 		onFieldClick: function() {
 			player.botAttack();
 		}
 	}, "canvas-enemy");
+
 	enemy.init();
 	enemy.drawer.visible = false;
 	enemy.generateBoats();

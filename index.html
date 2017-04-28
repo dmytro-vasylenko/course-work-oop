@@ -3,7 +3,8 @@
 <head>
 	<title>Sea Battle</title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 	<link rel="stylesheet" href="inc/css/style.css">
 	<link rel="stylesheet" href="inc/css/animate.css">
 	<script data-main="inc/js/classes/Main" type="text/javascript" src="bower_components/requirejs/require.js"></script>
@@ -11,9 +12,14 @@
 <body>
 	<img src="inc/img/bomb-miss.png" id="bomb-miss">
 	<img src="inc/img/bomb-on-target.png" id="bomb-on-target">
+	<div id="window" class="animated fadeInDownBig">
+		<p>Добро пожаловать! Выберите режим игры, пожалуйста.</p>
+		<button id="friend-button">С другом</button>
+		<button id="bot-button">С ботом</button>
+	</div>
 	<div id="playground">
-		<canvas id="canvas-player" class="animated fadeInLeft" height="300" width="300"></canvas>
-		<canvas id="canvas-enemy" class="animated fadeInRight" height="300" width="300"></canvas>
+		<canvas id="canvas-player" class="animated" height="300" width="300"></canvas>
+		<canvas id="canvas-enemy" class="animated" height="300" width="300"></canvas>
 	</div>
 </body>
 </html>

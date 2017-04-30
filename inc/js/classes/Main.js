@@ -15,6 +15,7 @@ require(["Player", "Boat"], function(Player, Boat) {
 	var player;
 	var enemy;
 
+	var canRemove = true;
 
 	$("#bot-button").on("click", function() {
 		$("#window-welcome").addClass("fadeOut");
@@ -31,6 +32,7 @@ require(["Player", "Boat"], function(Player, Boat) {
 		enemy = new Player("Бот", 10, 10, {
 			onFieldClick: function() {
 				player.botAttack();
+				canRemove = false;
 			},
 			loss: function() {
 				player.canAttacked = false;
@@ -40,8 +42,6 @@ require(["Player", "Boat"], function(Player, Boat) {
 		enemy.init();
 		enemy.drawer.visible = false;
 		enemy.generateBoats();
-
-		// console.log(player.printField());
 	});
 	$("#reset-game").on("click", function() {
 		player.reset();
@@ -50,5 +50,12 @@ require(["Player", "Boat"], function(Player, Boat) {
 		$("#window-win").removeClass("fadeInDown");
 		$("#window-win").addClass("fadeOut");
 		$("#window-win").css({zIndex: -1000});
+	});
+
+	$("#canvas-player").on("click", function() {
+		if(canRemove) {
+			player.reset();
+			player.canAttacked = false;
+		}
 	});
 });

@@ -18,8 +18,8 @@ require(["Player", "Boat"], function(Player, Boat) {
 
 	$("#bot-button").on("click", function() {
 		$("#window-welcome").addClass("fadeOut");
-		$("#canvas-player").addClass("fadeInLeft");
-		$("#canvas-enemy").addClass("fadeInRight");
+		$("#canvas-player").show().addClass("fadeInLeft");
+		$("#canvas-enemy").show().addClass("fadeInRight");
 		$("#window-welcome").css({zIndex: -1000});
 
 		player = new Player($("#window-welcome input").val(), 10, 10, null, "canvas-player");
@@ -28,7 +28,7 @@ require(["Player", "Boat"], function(Player, Boat) {
 		player.generateBoats();
 		player.giveAI();
 
-		enemy = new Player("Враг", 10, 10, {
+		enemy = new Player("Бот", 10, 10, {
 			onFieldClick: function() {
 				player.botAttack();
 			},
@@ -40,6 +40,8 @@ require(["Player", "Boat"], function(Player, Boat) {
 		enemy.init();
 		enemy.drawer.visible = false;
 		enemy.generateBoats();
+
+		// console.log(player.printField());
 	});
 	$("#reset-game").on("click", function() {
 		player.reset();

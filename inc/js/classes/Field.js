@@ -5,13 +5,7 @@ define([], function() {
 			this.height = height;
 			this.boats = []
 			this.cells = [];
-			for(var i = 0; i < this.height; i++) {
-				var raw = [];
-				for(var j = 0; j < this.width; j++) {
-					raw.push(null);
-				}
-				this.cells.push(raw);
-			}
+			this.generateCells();
 		}
 
 		setCellsAround(x, y, data = "N") {
@@ -25,7 +19,7 @@ define([], function() {
 				if(x + steps[i][0] < this.width && y + steps[i][1] < this.height
 					&& x + steps[i][0] >= 0 && y + steps[i][1] >= 0
 					&& !this.is(x + steps[i][0], y + steps[i][1], "B"))
-						this.cells[x + steps[i][0]][y + steps[i][1]] = data;
+						this.cells[x + steps[i][0]][y + steps[i][1]] += data;
 			}
 		}
 
@@ -57,11 +51,17 @@ define([], function() {
 
 		clearCells() {
 			this.cells = [];
+			this.generateCells();
+		}
+
+		generateCells() {
+			var counter = -1;
 			for(var i = 0; i < this.height; i++) {
 				var raw = [];
 				for(var j = 0; j < this.width; j++) {
-					raw.push(null);
+					raw.push((counter++ % 4 == 0 ? "Y" : counter % 2 == 0 ? "W" : "G").toString());
 				}
+				counter--;
 				this.cells.push(raw);
 			}
 		}

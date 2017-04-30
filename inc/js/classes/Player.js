@@ -24,11 +24,11 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			for(var i = 0; i < boat.length; i++) {
 				if(boat.orientation === "H") {
 					this.field.setCellsAround(boat.x + i, boat.y);
-					this.field.cells[boat.x + i][boat.y] = "B";
+					this.field.cells[boat.x + i][boat.y] += "B";
 				}
 				else if(boat.orientation === "V") {
 					this.field.setCellsAround(boat.x, boat.y + i);
-					this.field.cells[boat.x][boat.y + i] = "B";
+					this.field.cells[boat.x][boat.y + i] += "B";
 				}
 			}
 		}
@@ -57,7 +57,8 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 				for(var j = 0; j < this.field.cells[i].length; j++) {
 					if(this.field.is(i, j, "B"))
 						counter++;
-					result += (this.field.cells[i][j] ? this.field.cells[i][j] + "  " : ".    ");
+					// result += this.field.is(i, j, "Y") ? "Y " : this.field.is(i, j, "W") ? "W " : this.field.is(i, j, "G") ? "G " : ". ";
+					result += this.field.cells[j][i][0] + " ";
 				}
 				result += "\n";
 			}
@@ -125,7 +126,7 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 						this.field.deleteBoat(boat);
 						var steps = [
 							[-1, -1], [0, -1], [1, -1],
-							[-1, 0], [1, 0],
+							[-1, 0], [0, 0], [1, 0],
 							[-1, 1], [0, 1], [1, 1]
 						];
 						var k = [];
@@ -143,6 +144,9 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 									this.drawer.drawMine(x, y, true);
 									this.field.cells[x][y] += "X";
+									if(this.AI)
+										this.AI.cellTypes[this.field.cells[x][y][0]]--;
+									this.field.cells[x][y] = "Z" + this.field.cells[x][y].substring(1);
 								}
 							}
 						}

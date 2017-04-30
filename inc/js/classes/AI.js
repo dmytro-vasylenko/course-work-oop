@@ -1,7 +1,6 @@
 define([], function() {
 	return class AI {
 		constructor(player) {
-			// console.log(player);
 			this.player = player.player;
 			this.hit = false;
 			this.attackX = 0;
@@ -14,16 +13,28 @@ define([], function() {
 				top: true,
 				bot: true
 			};
+			this.currentCellType = "G";
+			this.cellTypes = {
+				"G": 24,
+				"Y": 26,
+				"W": 50
+			}
 			this.game = true;
 		}
 
 		attack() {
 			if(this.game)
 				if(!this.hit) {
+					if(this.cellTypes[this.currentCellType] == 0) {
+						if(this.currentCellType == "G")
+							this.currentCellType = "Y";
+						else
+							this.currentCellType = "W";
+					}
 					do {
 						var x = Math.floor(Math.random() * this.player.field.width);
 						var y = Math.floor(Math.random() * this.player.field.height);
-					} while(this.player.field.is(x, y, "X"));
+					} while(this.player.field.is(x, y, "X") || !this.player.field.is(x, y, this.currentCellType));
 					this.attackCell(x, y);
 					if(this.player.field.is(x, y, "B")) {
 						if(!this.player.field.findBoat(x, y)) {
@@ -85,6 +96,7 @@ define([], function() {
 										this.directions.right = false;
 										break;
 									}
+
 								}
 							} else {
 								if(this.directions.top && this.attackY - i >= 0) {
@@ -93,12 +105,14 @@ define([], function() {
 										this.directions.top = false;
 										break;
 									}
+
 								} else if(this.attackY + i < this.player.field.height) {
 									this.attackCell(this.attackX, this.attackY + i);
 									if(!this.player.field.is(this.attackX, this.attackY + i, "B")) {
 										this.directions.bot = false;
 										break;
 									}
+
 								}
 							}
 						}
@@ -120,12 +134,29 @@ define([], function() {
 				}
 		}
 
+		// removeTypes(x, y) {
+		// 	var steps = [
+		// 		[-1, -1], [0, -1], [1, -1],
+		// 		[-1, 0], [0, 0], [1, 0],
+		// 		[-1, 1], [0, 1], [1, 1]
+		// 	];
+
+		// 	for(var i = 0; i < steps.length; i++) {
+		// 		var curX = x + steps[i][0];
+		// 		var curY = y + steps[i][1];
+		// 		if(curX >= 0 && curX < this.player.field.width && curY >= 0 && curY < this.player.field.height) {
+		// 			if(this.player.field.cells[curX][curY][0] != "Z") {
+		// 				this.cellTypes[this.player.field.cells[curX][curY][0]]--;
+		// 				this.player.field.cells[curX][curY] = "Z" + this.player.field.cells[curX][curY].substring(1);
+		// 			}
+		// 		}
+		// 	}
+		// }
+
 		attackCell(x, y) {
+			this.cellTypes[this.player.field.cells[x][y][0]]--;
+			this.player.field.cells[x][y] = "Z" + this.player.field.cells[x][y].substring(1);
 			this.player.attack(x, y);
-		}
-
-		getAreaLength(x, y) {
-
 		}
 	};
 });

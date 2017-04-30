@@ -134,25 +134,6 @@ define([], function() {
 				}
 		}
 
-		// removeTypes(x, y) {
-		// 	var steps = [
-		// 		[-1, -1], [0, -1], [1, -1],
-		// 		[-1, 0], [0, 0], [1, 0],
-		// 		[-1, 1], [0, 1], [1, 1]
-		// 	];
-
-		// 	for(var i = 0; i < steps.length; i++) {
-		// 		var curX = x + steps[i][0];
-		// 		var curY = y + steps[i][1];
-		// 		if(curX >= 0 && curX < this.player.field.width && curY >= 0 && curY < this.player.field.height) {
-		// 			if(this.player.field.cells[curX][curY][0] != "Z") {
-		// 				this.cellTypes[this.player.field.cells[curX][curY][0]]--;
-		// 				this.player.field.cells[curX][curY] = "Z" + this.player.field.cells[curX][curY].substring(1);
-		// 			}
-		// 		}
-		// 	}
-		// }
-
 		attackCell(x, y) {
 			this.cellTypes[this.player.field.cells[x][y][0]]--;
 			this.player.field.cells[x][y] = "Z" + this.player.field.cells[x][y].substring(1);

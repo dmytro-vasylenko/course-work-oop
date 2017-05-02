@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sea Battle</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<link rel="stylesheet" href="inc/css/style.css">
+	<link rel="stylesheet" href="inc/css/animate.css">
+	<link rel="shortcut icon" href="inc/img/favicon.png" type="image/x-icon">
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/jquery.cookie/jquery.cookie.js"></script>
+	<script data-main="inc/js/classes/MainOnline" type="text/javascript" src="bower_components/requirejs/require.js"></script>
+</head>
+<body>
+	<img src="inc/img/bomb-miss.png" id="bomb-miss">
+	<img src="inc/img/bomb-on-target.png" id="bomb-on-target">
+	<div id="window-win" class="animated">
+		<h3>Игрок <b></b> проиграл!</h3>
+		<button id="reset-game">Играть еще раз</button>
+	</div>
+	<div id="playground">
+		<canvas id="canvas-player" class="animated fadeInLeft" height="300" width="300"></canvas>
+		<canvas id="canvas-enemy" class="animated fadeInRight" height="300" width="300"></canvas>
+	</div>
+</body>
+</html>

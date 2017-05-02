@@ -1,0 +1,116 @@
+@font-face
+	font-family: "Roboto Condensed"
+	src: url(../fonts/RobotoCondensed-Regular.ttf)
+
+*
+	margin: 0
+	padding: 0
+	font-family: "Roboto Condensed", Arial
+
+body
+	background: url(../img/background.png)
+
+#playground
+	width: 615px
+	height: 300px
+	position: fixed
+	left: 0
+	right: 0
+	margin: auto
+	top: 0
+	bottom: 0
+	display: block
+
+	canvas
+		border: 1px solid black
+		box-shadow: 0 0 10px grey
+		background: rgba(255, 255, 255, 0.3)
+		float: left
+		opacity: 0
+		cursor: cell
+		display: none
+
+	#canvas-player
+		margin-right: 10px
+
+img
+	display: none
+
+#window-welcome, #window-win
+	width: 400px
+	height: 200px
+	left: 0
+	right: 0
+	top: 0
+	bottom: 0
+	margin: auto
+	position: fixed
+	z-index: 1000
+	background: white
+	border-radius: 5px
+	box-shadow: 0 0 20px black
+	overflow: hidden
+	text-align: center
+
+	p
+		font-size: 16px
+		padding: 20px
+
+	button
+		width: 100px
+		height: 40px
+		border: none
+		margin-top: 25px
+		background: #7272d0
+		color: white
+		text-transform: uppercase
+		font-weight: bold
+		border-radius: 5px
+		transition: background 0.15s ease-in
+		cursor: pointer
+
+		&:hover
+			background: #4949B0
+
+	input
+		text-align: center
+		width: 200px
+		height: 30px
+		display: block
+		margin: 0 auto
+		padding: 0 10px
+		box-sizing: border-box
+		font-size: 16px
+
+	// #friend-button
+	// 	cursor: not-allowed
+	// 	transition: none
+
+#window-win
+	opacity: 0
+	z-index: -1000
+
+	h3
+		font-size: 24px
+		margin-top: 40px
+
+	button
+		margin-top: 50px !important
+		width: 140px !important
+
+@media all and (max-width: 630px)
+	#playground
+		width: 300px
+		height: 610px
+
+		canvas
+			margin-bottom: 10px
+
+	#window-welcome, #window-win
+		width: 90%
+
+		button
+			width: 40%
+
+		input
+			width: 80%

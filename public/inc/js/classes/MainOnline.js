@@ -11,28 +11,48 @@ require.config({
 	}
 });
 
+
+var gameID = window.location.href.substr(22);
+
 require(["Player", "WebSocket"], function(Player, WS) {
 
 
 	$("#canvas-player, #canvas-enemy").show();
 
-	var player = new Player("Создатель", 10, 10, {
+	var player;
+	var enemy;
+
+
+	player = new Player("ВЫ", 10, 10, {
 		loss: function() {
 			player.canAttacked = false;
-		}
+		},
+		ws: new WS()
 	}, "canvas-player");
 
-	var ws = new WS(player, function() {
-		ws.send("ready", $.cookie("user-id"));
-	});
-
-	var enemy = new Player("Враг", 10, 10, {
+	enemy = new Player("Враг", 10, 10, {
 		gameType: "ONLINE",
 		loss: function() {
 			player.canAttacked = false;
 		},
-		ws
+		ws: new WS()
 	}, "canvas-enemy");
+
+	var ws = new WS(player, enemy, function() {
+		if(!$.cookie("user-id")) {
+			var id = Math.random().toString().substr(2);
+			$.cookie("user-id", id);
+		}
+		ws.send("registration", $.cookie("user-id"));
+		ws.send("ready", {
+			user: $.cookie("user-id"),
+			game: gameID,
+			cells: player.field.cells,
+			boats: player.field.boats
+		});
+	});
+
+
 
 
 	player.init();
@@ -51,10 +71,10 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		$("#window-win").css({zIndex: -1000});
 	});
 
-	$("#canvas-player").on("click", function() {
-		if(canRemove) {
-			player.reset();
-			player.canAttacked = false;
-		}
-	});
+	// $("#canvas-player").on("click", function() {
+	// 	if(canRemove) {
+	// 		player.reset();
+	// 		player.canAttacked = false;
+	// 	}
+	// });
 });

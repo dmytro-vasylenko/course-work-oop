@@ -9,29 +9,42 @@ define([], function() {
 		}
 
 		setCellsAround(x, y, data = "N") {
-			var steps = [
+			let steps = [
 				[-1, -1], [0, -1], [1, -1],
 				[-1, 0], [1, 0],
 				[-1, 1], [0, 1], [1, 1]
 			];
 
-			for(var i = 0; i < steps.length; i++) {
-				if(x + steps[i][0] < this.width && y + steps[i][1] < this.height
-					&& x + steps[i][0] >= 0 && y + steps[i][1] >= 0
-					&& !this.is(x + steps[i][0], y + steps[i][1], "B"))
-						this.cells[x + steps[i][0]][y + steps[i][1]] += data;
+			for(let i = 0; i < steps.length; i++) {
+				let cellX = x + steps[i][0];
+				let cellY = y + steps[i][1];
+				if(this.isOnField(cellX, cellY) && !this.is(cellX, cellY, "B")) {
+					this.cells[cellX][cellY] += data;
+				}
 			}
 		}
 
-		is(x, y, param) {
-			if(this.cells[x][y] != null && this.cells[x][y].indexOf(param) != -1)
+		is(x, y, value) {
+			if(this.cells[x][y] != null && this.cells[x][y].indexOf(value) != -1)
 				return true;
 
 			return false;
 		}
 
+		isEmptyOfBoat(x, y) {
+			return !this.is(x, y, "N") && !this.is(x, y, "B");
+		}
+
+		isOnField(x, y) {
+			return x >= 0 && y >= 0 && x < this.width && y < this.height;
+		}
+
+		isBoatExist(x, y) {
+			return this.findBoat(x, y) != null;
+		}
+
 		findBoat(x, y) {
-			for(var i = 0; i < this.boats.length; i++) {
+			for(let i = 0; i < this.boats.length; i++) {
 				if(this.boats[i].x == x && this.boats[i].y == y) {
 					return this.boats[i];
 				}
@@ -43,7 +56,7 @@ define([], function() {
 		}
 
 		deleteBoat(boat) {
-			for(var i = 0; i < this.boats.length; i++) {
+			for(let i = 0; i < this.boats.length; i++) {
 				if(this.boats[i] == boat)
 					this.boats.splice(i, 1);
 			}
@@ -55,10 +68,10 @@ define([], function() {
 		}
 
 		generateCells() {
-			var counter = -1;
-			for(var i = 0; i < this.height; i++) {
-				var raw = [];
-				for(var j = 0; j < this.width; j++) {
+			let counter = -1;
+			for(let i = 0; i < this.height; i++) {
+				let raw = [];
+				for(let j = 0; j < this.width; j++) {
 					raw.push((counter++ % 4 == 0 ? "Y" : counter % 2 == 0 ? "W" : "G").toString());
 				}
 				counter--;

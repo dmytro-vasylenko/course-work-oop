@@ -21,12 +21,11 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			this.field.boats.push(boat);
 			this.drawer.drawBoat(boat);
 
-			for(var i = 0; i < boat.length; i++) {
+			for(let i = 0; i < boat.length; i++) {
 				if(boat.orientation === "H") {
 					this.field.setCellsAround(boat.x + i, boat.y);
 					this.field.cells[boat.x + i][boat.y] += "B";
-				}
-				else if(boat.orientation === "V") {
+				} else if(boat.orientation === "V") {
 					this.field.setCellsAround(boat.x, boat.y + i);
 					this.field.cells[boat.x][boat.y + i] += "B";
 				}
@@ -34,13 +33,13 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 		}
 
 		generateBoats() {
-			for(var length = MAX_BOAT_LENGTH; length > 0; length--) {
-				for(var number = MAX_BOAT_LENGTH - length + 1; number > 0; number--) {
+			for(let length = MAX_BOAT_LENGTH; length > 0; length--) {
+				for(let number = MAX_BOAT_LENGTH - length + 1; number > 0; number--) {
 					while(true) {
-						var x = Math.round(Math.random() * (this.field.width - 1));
-						var y = Math.round(Math.random() * (this.field.height - 1));
-						var orientation = Math.round(Math.random() * 2) % 2 === 1 ? "H" : "V";
-						var boat = new Boat(x, y, length, orientation);
+						let x = Math.round(Math.random() * (this.field.width - 1));
+						let y = Math.round(Math.random() * (this.field.height - 1));
+						let orientation = Math.round(Math.random() * 2) % 2 === 1 ? "H" : "V";
+						let boat = new Boat(x, y, length, orientation);
 						if(this.canAddBoard(boat)) {
 							this.addBoard(boat);
 							break;
@@ -51,13 +50,15 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 		}
 
 		printField() {
-			var result = "";
-			var counter = 0;
-			for(var i = 0; i < this.field.cells.length; i++) {
-				for(var j = 0; j < this.field.cells[i].length; j++) {
-					if(this.field.is(i, j, "B"))
-						counter++;
-					result += this.field.cells[j][i][0] + " ";
+			let result = "";
+			let counter = 0;
+			for(let i = 0; i < this.field.cells.length; i++) {
+				for(let j = 0; j < this.field.cells[i].length; j++) {
+					if(this.field.is(i, j, "B")) {
+						counter += 1;
+					}
+					result += this.field.cells[i][j][0] + " ";
+					// result += this.field.is(j, i, "B") ? "X " : ". ";
 				}
 				result += "\n";
 			}
@@ -67,8 +68,7 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 		canAddBoard(boat) {
 			if(boat.length === 1) {
-				if(this.field.is(boat.x, boat.y, "N") ||
-					this.field.is(boat.x, boat.y, "B"))
+				if(!this.field.isEmptyOfBoat(boat.x, boat.y))
 					return false;
 
 				return true;
@@ -78,18 +78,15 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 				if(boat.x + boat.length > this.field.width)
 					return false;
 
-				for(var i = 0; i < boat.length; i++)
-					if(this.field.is(boat.x + i, boat.y, "N") ||
-						this.field.is(boat.x + i, boat.y, "B"))
+				for(let i = 0; i < boat.length; i++)
+					if(!this.field.isEmptyOfBoat(boat.x + i, boat.y))
 						return false;
-			}
-			else if(boat.orientation === "V") {
+			} else if(boat.orientation === "V") {
 				if(boat.y + boat.length > this.field.height)
 					return false;
 
-				for(var i = 0; i < boat.length; i++) {
-					if(this.field.is(boat.x, boat.y + i, "N") ||
-						this.field.is(boat.x, boat.y + i, "B"))
+				for(let i = 0; i < boat.length; i++) {
+					if(!this.field.isEmptyOfBoat(boat.x, boat.y + i))
 						return false;
 				}
 			}
@@ -99,95 +96,96 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 		onFieldClick(event) {
 			if(this.canAttacked) {
-				var x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
-				var y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
+				let x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
+				let y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
 				if(x >= this.canvas.width)
 					x = this.canvas.width - 1;
 				if(y >= this.canvas.height)
 					y = this.canvas.height - 1;
-				var cellX = Math.floor(x / this.drawer.cellWidth);
-				var cellY = Math.floor(y / this.drawer.cellHeight);
+				let cellX = Math.floor(x / this.drawer.cellWidth);
+				let cellY = Math.floor(y / this.drawer.cellHeight);
 				this.attack(cellX, cellY);
 			}
 		}
 
+		// TODO: укоротить метод за счет выноса ВС
 		attack(x, y) {
 			var hit = false;
-			if(this.observer.gameType == "ONLINE") {
-				this.observer.ws.send("attack", {
-					user: $.cookie("user-id"),
-					x,
-					y
-				});
-			}
 			if(!this.field.is(x, y, "X")) {
+				if(this.observer.gameType && this.observer.gameType == "ONLINE") {
+					this.observer.ws.send("attack", {
+						game: gameID,
+						user: $.cookie("user-id"),
+						x,
+						y
+					});
+					if(!this.field.is(x, y, "B")) {
+						this.observer.ws.send("swap", { game: gameID });
+						this.canAttacked = false;
+					}
+				}
 				this.field.cells[x][y] = this.field.cells[x][y] ? this.field.cells[x][y] + "X" : "X";
 				if(this.field.is(x, y, "B")) {
 					hit = true;
 					this.drawer.drawMine(x, y);
-					var boat = this.field.findBoat(x, y);
-					boat.lives--;
-					if(!boat.lives) {
-						this.field.deleteBoat(boat);
-						var steps = [
-							[-1, -1], [0, -1], [1, -1],
-							[-1, 0], [0, 0], [1, 0],
-							[-1, 1], [0, 1], [1, 1]
-						];
-						var k = [];
-						if(boat.orientation == "H")
-							k = [1, 0];
-						else if(boat.orientation == "V")
-							k = [0, 1];
-
-						for(var l = 0; l < boat.length; l++) {
-							for(var i = 0; i < steps.length; i++) {
-								var x = boat.x + steps[i][0] + l*k[0];
-								var y = boat.y + steps[i][1] + l*k[1];
-								if(x >= 0 && y >= 0 && x < this.field.width && y < this.field.height &&
-									this.field.is(x, y, "N") && !this.field.is(x, y, "X")) {
-
-									this.drawer.drawMine(x, y, true);
-									this.field.cells[x][y] += "X";
-									if(this.AI)
-										this.AI.cellTypes[this.field.cells[x][y][0]]--;
-									this.field.cells[x][y] = "Z" + this.field.cells[x][y].substring(1);
-								}
-							}
-						}
+					let boat = this.field.findBoat(x, y);
+					if(!--boat.lives) {
+						this.killBoat(boat);
 					}
-					if(this.checkLose()) {
-						if(this.AI)
-							this.AI.game = false;
-						if(this.observer)
-							this.observer.loss();
-						this.canAttacked = false;
-						$("#window-win b").text(this.name);
-						$("#window-win").css({zIndex: 100});
-						$("#window-win").removeClass("fadeOut");
-						$("#window-win").addClass("fadeInDown");
-					}
+					this.checkLose();
 				} else {
 					this.drawer.drawMine(x, y, true);
 				}
-				if(this.observer.onFieldClick && !hit)
-				{
+				if(this.observer.onFieldClick && !hit) {
 					this.observer.onFieldClick();
 				}
 			}
 		}
 
-		checkLose() {
-			if(!this.field.boats.length)
-				return true;
+		//TODO: вынести AI нахуй
+		killBoat(boat) {
+			this.field.deleteBoat(boat);
+			let steps = [
+				[-1, -1], [0, -1], [1, -1],
+				[-1, 0], [0, 0], [1, 0],
+				[-1, 1], [0, 1], [1, 1]
+			];
+			let k = [];
+			if(boat.orientation == "H")
+				k = [1, 0];
+			else if(boat.orientation == "V")
+				k = [0, 1];
 
-			return false;
+			for(let l = 0; l < boat.length; l++) {
+				for(let i = 0; i < steps.length; i++) {
+					let x = boat.x + steps[i][0] + l*k[0];
+					let y = boat.y + steps[i][1] + l*k[1];
+					if(this.field.isOnField(x, y) && this.field.is(x, y, "N") && !this.field.is(x, y, "X")) {
+						this.drawer.drawMine(x, y, true);
+						this.field.cells[x][y] += "X";
+						if(this.AI)
+							this.AI.cellsTypes[this.field.cells[x][y][0]]--;
+					}
+				}
+			}
+		}
+
+		checkLose() {
+			if(!this.field.boats.length) {
+				if(this.AI)
+					this.AI.game = false;
+				if(this.observer.loss)
+					this.observer.loss();
+				this.canAttacked = false;
+				$("#window-win b").text(this.name);
+				$("#window-win").css({zIndex: 100});
+				$("#window-win").removeClass("fadeOut");
+				$("#window-win").addClass("fadeInDown");
+			}
 		}
 
 		giveAI() {
-			this.AI = new AI({
-				player: this
-			});
+			this.AI = new AI({ player: this });
 		}
 
 		botAttack() {
@@ -200,9 +198,9 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			this.field.clearCells();
 			this.field.clearBoats();
 			this.drawer.drawField();
-			this.AI = new AI({
-				player: this
-			});
+			if(this.AI) {
+				this.AI = new AI({ player: this });
+			}
 			this.generateBoats();
 		}
 	};

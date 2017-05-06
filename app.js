@@ -3,7 +3,7 @@ var WebSocket = require("ws");
 
 var app = express();
 
-var clients = [];
+var clients = {};
 var games = {};
 
 app.use(express.static('public'));
@@ -13,67 +13,99 @@ var websocket = new WebSocket.Server({
 });
 
 app.get("/", function(req, res) {
-	res.sendfile("index.html");
+	res.sendFile(__dirname + "/index.html");
 });
-	websocket.on("connection", function(ws) {
-		ws.on("message", function(message) {
-			message = JSON.parse(message);
-			if(message.type == "registration") {
-				clients.push({id: message.data, ws: ws});
-				console.log("new client:", clients[clients.length - 1]);
-			} else if(message.type == "startgame") {
-				var gameID = Math.random().toString().substr(2);
-				games[gameID] = {
-					creator: message.data,
-					enemy: null,
-					state: true,
-					turn: message.data,
-					data: null
-				};
-				ws.send(JSON.stringify({
-					type: "url",
-					data: gameID
-				}));
-				console.log("new game: ", games[gameID]);
-			}
-		});
-	});
 
 app.get("/:id", function(req, res) {
-	res.sendfile("public/online_index.html");
-	var gameID = req.params.id;
+	if(!games[req.params.id])
+		res.redirect("/");
+	else
+		res.sendFile(__dirname + "/public/online_index.html");
+});
 
-	websocket.on("connection", function(ws) {
-		ws.on("message", function(message) {
-			message = JSON.parse(message);
-			if(message.type == "ready") {
-				if(!clients[message.data])
-					clients[message.data] = ws;
-				console.log("READY", message.data);
-				if(games[gameID] && message.data != games[gameID].creator) {
-					games[gameID].enemy = message.data;
-					// clients[games[gameID].creator].send(JSON.stringify({
-					// 	type: "attack",
-					// 	data: {
-					// 		x: 3,
-					// 		y: 3
-					// 	}
-					// }));
-				}
-			} else if(message.type == "attack") {
-				var player = null;
-				
-				clients[games[gameID].turn].send(JSON.stringify({
+websocket.on("connection", function(ws) {
+	ws.on("message", function(message) {
+		message = JSON.parse(message);
+		switch(message.type) {
+		case "registration":
+			clients[message.data] = ws;
+			console.log("new client:", message.data);
+			break;
+		case "startgame":
+			var gameID = Math.random().toString().substr(2);
+			games[gameID] = {
+				creator: message.data,
+				enemy: null,
+				state: true,
+				turn: message.data,
+				creatorData: null,
+				enemyData: null
+			};
+			ws.send(JSON.stringify({
+				type: "url",
+				data: gameID
+			}));
+			break;
+		case "ready":
+			var currentGame = games[message.data.game];
+			if(currentGame.creator != message.data.user) {
+				currentGame.enemy = message.data.user;
+				currentGame.enemyData = {
+					cells: message.data.cells,
+					boats: message.data.boats
+				};
+
+				clients[currentGame.creator].send(JSON.stringify({
+					type: "field",
+					data: {
+						cells: currentGame.enemyData.cells,
+						boats: currentGame.enemyData.boats,
+					}
+				}));
+				clients[currentGame.enemy].send(JSON.stringify({
+					type: "field",
+					data: {
+						cells: currentGame.creatorData.cells,
+						boats: currentGame.creatorData.boats,
+					}
+				}));
+			} else {
+				currentGame.creatorData = {
+					cells: message.data.cells,
+					boats: message.data.boats
+				};
+			}
+			break;
+		case "attack":
+			var currentGame = games[message.data.game];
+			if(currentGame.enemy && currentGame.turn != message.data.user) {
+				clients[currentGame.turn].send(JSON.stringify({
 					type: "attack",
 					data: {
 						x: message.data.x,
 						y: message.data.y
 					}
 				}));
-				games[gameID].turn = games[gameID].turn == games[gameID].creator ?
-									games[gameID].enemy : games[gameID].creator;
 			}
-		});
+			break;
+		case "swap":
+			currentGame = games[message.data.game];
+			if(currentGame.turn == currentGame.creator) {
+				currentGame.turn = currentGame.enemy;
+				clients[currentGame.creator].send(JSON.stringify({
+					type: "attack-state",
+					data: null
+				}));
+			}
+			else {
+				clients[currentGame.enemy].send(JSON.stringify({
+					type: "attack-state",
+					data: null
+				}));
+				currentGame.turn = currentGame.creator;
+			}
+			break;
+		}
 	});
 });
 

@@ -82,10 +82,9 @@ define(["Boat", "Drawer", "Field", "AI", "WebSocket"], function(Boat, Drawer, Fi
 		}
 
 		onFieldClick(event) {
-			console.log(event);
 			if(this.canAttacked) {
-				let x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
-				let y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
+				let x = event.clientX - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
+				let y = event.clientY - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
 				if(x >= this.canvas.width)
 					x = this.canvas.width - 1;
 				if(y >= this.canvas.height)

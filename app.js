@@ -46,10 +46,12 @@ websocket.on("connection", function(ws) {
 				data: gameID
 			}));
 			break;
+		// TODO: сделать проверку на больше чем три игрока в одной игре
 		case "ready":
 			var currentGame = games[message.data.game];
 			if(currentGame.creator != message.data.user) {
 				currentGame.enemy = message.data.user;
+				currentGame.turn = currentGame.enemy;
 				currentGame.enemyData = {
 					cells: message.data.cells,
 					boats: message.data.boats
@@ -63,6 +65,8 @@ websocket.on("connection", function(ws) {
 					cells: currentGame.creatorData.cells,
 					boats: currentGame.creatorData.boats,
 				});
+				sendData(currentGame.enemy, "attack-state", true);
+				console.log(games);
 			} else {
 				currentGame.creatorData = {
 					cells: message.data.cells,
@@ -73,8 +77,11 @@ websocket.on("connection", function(ws) {
 			break;
 		case "attack":
 			var currentGame = games[message.data.game];
-			if(currentGame.enemy && currentGame.turn != message.data.user) {
-				sendData(currentGame.turn, "attack", {
+			if(currentGame.enemy && currentGame.turn == message.data.user) {
+				var enemyPlayer = currentGame.creator;
+				if(currentGame.turn == currentGame.creator)
+					enemyPlayer = currentGame.enemy;
+				sendData(enemyPlayer, "attack", {
 					x: message.data.x,
 					y: message.data.y
 				});
@@ -84,10 +91,12 @@ websocket.on("connection", function(ws) {
 			currentGame = games[message.data.game];
 			if(currentGame.turn == currentGame.creator) {
 				currentGame.turn = currentGame.enemy;
-				sendData(currentGame.creator, "attack-state", true);
+				sendData(currentGame.creator, "attack-state", false);
+				sendData(currentGame.enemy, "attack-state", true);
 			}
 			else {
-				sendData(currentGame.enemy, "attack-state", true);
+				sendData(currentGame.enemy, "attack-state", false);
+				sendData(currentGame.creator, "attack-state", true);
 				currentGame.turn = currentGame.creator;
 			}
 			break;
@@ -96,6 +105,9 @@ websocket.on("connection", function(ws) {
 });
 
 function sendData(client, type, data) {
+	if(!clients[client])
+		return;
+
 	clients[client].send(JSON.stringify({
 		type,
 		data

@@ -33,8 +33,14 @@ define([], function() {
 						this.player.attack(message.data.x, message.data.y);
 						break;
 					case "attack-state":
-						console.log("PIZDEC");
 						this.enemy.canAttacked = message.data;
+						if(this.enemy.canAttacked) {
+							$(this.enemy.canvas).css({"box-shadow": "0 0 5px 5px green"});
+							$(this.player.canvas).css({"box-shadow": "none"});
+						} else {
+							$(this.enemy.canvas).css({"box-shadow": "none"});
+							$(this.player.canvas).css({"box-shadow": "0 0 5px 5px red"});
+						}
 						break;
 				}
 			}.bind(this);

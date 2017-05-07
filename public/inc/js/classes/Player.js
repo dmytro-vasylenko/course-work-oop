@@ -1,4 +1,4 @@
-define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
+define(["Boat", "Drawer", "Field", "AI", "WebSocket"], function(Boat, Drawer, Field, AI, WebSocket) {
 	const MAX_BOAT_LENGTH = 4;
 
 	return class Player {
@@ -9,6 +9,10 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			this.canvas = document.getElementById(selector);
 			this.drawer = new Drawer(this.field, this.canvas);
 			this.canAttacked = true;
+
+			if(this.observer.gameType == "ONLINE") {
+				this.ws = new WebSocket();
+			}
 
 			document.getElementById(selector).addEventListener("mousedown", this.onFieldClick.bind(this), false);
 		}
@@ -78,6 +82,7 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 		}
 
 		onFieldClick(event) {
+			console.log(event);
 			if(this.canAttacked) {
 				let x = event.x - document.getElementById("playground").offsetLeft - this.canvas.offsetLeft;
 				let y = event.y - document.getElementById("playground").offsetTop - this.canvas.offsetTop;
@@ -91,23 +96,23 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			}
 		}
 
-		// TODO: укоротить метод за счет выноса ВС
+		// TODO: укоротить метод за счет выноса WS
 		attack(x, y) {
 			var hit = false;
 			if(!this.field.is(x, y, "X")) {
-				if(this.observer.gameType && this.observer.gameType == "ONLINE") {
-					this.observer.ws.send("attack", {
+				if(this.observer.gameType == "ONLINE") {
+					this.ws.send("attack", {
 						game: gameID,
 						user: $.cookie("user-id"),
 						x,
 						y
 					});
 					if(!this.field.is(x, y, "B")) {
-						this.observer.ws.send("swap", { game: gameID });
+						this.ws.send("swap", { game: gameID });
 						this.canAttacked = false;
 					}
 				}
-				this.field.cells[x][y] = this.field.cells[x][y] ? this.field.cells[x][y] + "X" : "X";
+				this.field.cells[x][y] = this.field.cells[x][y] + "X";
 				if(this.field.is(x, y, "B")) {
 					hit = true;
 					this.drawer.drawMine(x, y);

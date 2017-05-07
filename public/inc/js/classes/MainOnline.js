@@ -23,16 +23,14 @@ require(["Player", "WebSocket"], function(Player, WS) {
 	player = new Player("ВЫ", 10, 10, {
 		loss: function() {
 			player.canAttacked = false;
-		},
-		ws: new WS()
+		}
 	}, "canvas-player");
 
 	enemy = new Player("Враг", 10, 10, {
 		gameType: "ONLINE",
 		loss: function() {
 			player.canAttacked = false;
-		},
-		ws: new WS()
+		}
 	}, "canvas-enemy");
 
 	var ws = new WS(player, enemy, function() {

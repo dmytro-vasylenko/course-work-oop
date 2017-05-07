@@ -15,13 +15,10 @@ require.config({
 var gameID = window.location.href.substr(22);
 
 require(["Player", "WebSocket"], function(Player, WS) {
-
-
 	$("#canvas-player, #canvas-enemy").show();
 
 	var player;
 	var enemy;
-
 
 	player = new Player("ВЫ", 10, 10, {
 		loss: function() {
@@ -52,16 +49,10 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		});
 	});
 
-
-
-
 	player.init();
 	player.generateBoats();
 	player.canAttacked = false;
 	enemy.init();
-
-	var canRemove = true;
-
 	$("#reset-game").on("click", function() {
 		player.reset();
 		player.canAttacked = false;
@@ -70,11 +61,4 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		$("#window-win").addClass("fadeOut");
 		$("#window-win").css({zIndex: -1000});
 	});
-
-	// $("#canvas-player").on("click", function() {
-	// 	if(canRemove) {
-	// 		player.reset();
-	// 		player.canAttacked = false;
-	// 	}
-	// });
 });

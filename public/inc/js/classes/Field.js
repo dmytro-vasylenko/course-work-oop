@@ -10,22 +10,22 @@ define([], function() {
 
 		setCellsAround(x, y, data = "N") {
 			let steps = [
-				[-1, -1], [0, -1], [1, -1],
-				[-1, 0], [1, 0],
-				[-1, 1], [0, 1], [1, 1]
+				{x: -1, y: -1}, {x: 0, y: -1},
+				{x: 1, y: -1}, {x: -1, y: 0},
+				{x: 1, y: 0}, {x: -1, y: 1},
+				{x: 0, y: 1}, {x: 1, y: 1}
 			];
-
 			for(let i = 0; i < steps.length; i++) {
-				let cellX = x + steps[i][0];
-				let cellY = y + steps[i][1];
-				if(this.isOnField(cellX, cellY) && !this.is(cellX, cellY, "B")) {
+				let cellX = x + steps[i].x;
+				let cellY = y + steps[i].y;
+				if(this.isOnField(cellX, cellY) && !this.is(cellX, cellY, data) && !this.is(cellX, cellY, "B")) {
 					this.cells[cellX][cellY] += data;
 				}
 			}
 		}
 
 		is(x, y, value) {
-			if(this.cells[x][y] != null && this.cells[x][y].indexOf(value) != -1)
+			if(this.isOnField(x, y) && this.cells[x][y].indexOf(value) != -1)
 				return true;
 
 			return false;
@@ -69,9 +69,9 @@ define([], function() {
 
 		generateCells() {
 			let counter = -1;
-			for(let i = 0; i < this.height; i++) {
+			for(let i = 0; i < this.width; i++) {
 				let raw = [];
-				for(let j = 0; j < this.width; j++) {
+				for(let j = 0; j < this.height; j++) {
 					raw.push((counter++ % 4 == 0 ? "Y" : counter % 2 == 0 ? "W" : "G").toString());
 				}
 				counter--;

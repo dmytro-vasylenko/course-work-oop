@@ -55,53 +55,39 @@ websocket.on("connection", function(ws) {
 					boats: message.data.boats
 				};
 
-				clients[currentGame.creator].send(JSON.stringify({
-					type: "field",
-					data: {
-						cells: currentGame.enemyData.cells,
-						boats: currentGame.enemyData.boats,
-					}
-				}));
-				clients[currentGame.enemy].send(JSON.stringify({
-					type: "field",
-					data: {
-						cells: currentGame.creatorData.cells,
-						boats: currentGame.creatorData.boats,
-					}
-				}));
+				sendData(currentGame.creator, "field", {
+					cells: currentGame.enemyData.cells,
+					boats: currentGame.enemyData.boats
+				});
+				sendData(currentGame.enemy, "field", {
+					cells: currentGame.creatorData.cells,
+					boats: currentGame.creatorData.boats,
+				});
 			} else {
 				currentGame.creatorData = {
 					cells: message.data.cells,
 					boats: message.data.boats
 				};
+				sendData(currentGame.creator, "attack-state", false);
 			}
 			break;
 		case "attack":
 			var currentGame = games[message.data.game];
 			if(currentGame.enemy && currentGame.turn != message.data.user) {
-				clients[currentGame.turn].send(JSON.stringify({
-					type: "attack",
-					data: {
-						x: message.data.x,
-						y: message.data.y
-					}
-				}));
+				sendData(currentGame.turn, "attack", {
+					x: message.data.x,
+					y: message.data.y
+				});
 			}
 			break;
 		case "swap":
 			currentGame = games[message.data.game];
 			if(currentGame.turn == currentGame.creator) {
 				currentGame.turn = currentGame.enemy;
-				clients[currentGame.creator].send(JSON.stringify({
-					type: "attack-state",
-					data: null
-				}));
+				sendData(currentGame.creator, "attack-state", true);
 			}
 			else {
-				clients[currentGame.enemy].send(JSON.stringify({
-					type: "attack-state",
-					data: null
-				}));
+				sendData(currentGame.enemy, "attack-state", true);
 				currentGame.turn = currentGame.creator;
 			}
 			break;
@@ -109,6 +95,12 @@ websocket.on("connection", function(ws) {
 	});
 });
 
+function sendData(client, type, data) {
+	clients[client].send(JSON.stringify({
+		type,
+		data
+	}));
+}
 
 app.listen(3000, function() {
 	console.log("Server started at http://localhost:3000/");

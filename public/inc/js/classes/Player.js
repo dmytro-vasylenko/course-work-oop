@@ -21,13 +21,14 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			this.field.boats.push(boat);
 			this.drawer.drawBoat(boat);
 
+
 			for(let i = 0; i < boat.length; i++) {
 				if(boat.orientation === "H") {
-					this.field.setCellsAround(boat.x + i, boat.y);
 					this.field.cells[boat.x + i][boat.y] += "B";
+					this.field.setCellsAround(boat.x + i, boat.y);
 				} else if(boat.orientation === "V") {
-					this.field.setCellsAround(boat.x, boat.y + i);
 					this.field.cells[boat.x][boat.y + i] += "B";
+					this.field.setCellsAround(boat.x, boat.y + i);
 				}
 			}
 		}
@@ -51,14 +52,11 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 		printField() {
 			let result = "";
-			let counter = 0;
 			for(let i = 0; i < this.field.cells.length; i++) {
+				// result += this.field.cells[i].length;
 				for(let j = 0; j < this.field.cells[i].length; j++) {
-					if(this.field.is(i, j, "B")) {
-						counter += 1;
-					}
-					result += this.field.cells[i][j][0] + " ";
-					// result += this.field.is(j, i, "B") ? "X " : ". ";
+					// result += this.field.cells[i][j][0] + " ";
+					// result += this.field.is(i, j, "N") ? "X " : ". ";
 				}
 				result += "\n";
 			}
@@ -73,7 +71,6 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 
 				return true;
 			}
-
 			if(boat.orientation === "H") {
 				if(boat.x + boat.length > this.field.width)
 					return false;

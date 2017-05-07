@@ -25,7 +25,7 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		$("#canvas-enemy").show().addClass("fadeInRight");
 		$("#window-welcome").css({zIndex: -1000});
 
-		player = new Player($("#window-welcome input").val(),  10, 10, {
+		player = new Player($("#window-welcome input").val(), 10, 10, {
 			gameType: "BOT",
 		}, "canvas-player");
 		player.init();

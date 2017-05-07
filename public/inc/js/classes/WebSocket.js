@@ -34,7 +34,7 @@ define([], function() {
 						break;
 					case "attack-state":
 						console.log("PIZDEC");
-						this.enemy.canAttacked = true;
+						this.enemy.canAttacked = message.data;
 						break;
 				}
 			}.bind(this);

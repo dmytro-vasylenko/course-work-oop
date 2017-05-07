@@ -50,20 +50,6 @@ define(["Boat", "Drawer", "Field", "AI"], function(Boat, Drawer, Field, AI) {
 			}
 		}
 
-		printField() {
-			let result = "";
-			for(let i = 0; i < this.field.cells.length; i++) {
-				// result += this.field.cells[i].length;
-				for(let j = 0; j < this.field.cells[i].length; j++) {
-					// result += this.field.cells[i][j][0] + " ";
-					// result += this.field.is(i, j, "N") ? "X " : ". ";
-				}
-				result += "\n";
-			}
-
-			return result;
-		}
-
 		canAddBoard(boat) {
 			if(boat.length === 1) {
 				if(!this.field.isEmptyOfBoat(boat.x, boat.y))

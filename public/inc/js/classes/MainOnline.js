@@ -16,27 +16,39 @@ var gameID = window.location.href.substr(22);
 
 require(["Player", "WebSocket"], function(Player, WS) {
 	$("#canvas-player, #canvas-enemy").show();
+	setTimeout(function() {
+		$("#canvas-player").removeClass("fadeInLeft").css({"display": "block", "opacity": 1});
+		$("#canvas-enemy").removeClass("fadeInRight").css({"display": "block", "opacity": 1});
+	}, 1000);
+
+	if($.cookie("creator")) {
+		$("#window-welcome input").val(window.location.href);
+		$("#window-welcome").show();
+		$.cookie("cireator", false);
+	}
 
 	var player;
 	var enemy;
 
-	player = new Player("ВЫ", 10, 10, {
+	player = new Player(10, 10, {
 		loss: function() {
 			player.canAttacked = false;
 		}
-	}, "canvas-player");
+	}, "canvas-player", "Вы проиграли!");
 
-	enemy = new Player("Враг", 10, 10, {
+	enemy = new Player(10, 10, {
 		gameType: "ONLINE",
 		loss: function() {
 			player.canAttacked = false;
 		}
-	}, "canvas-enemy");
+	}, "canvas-enemy", "Вы выиграли!");
 
 	var ws = new WS(player, enemy, function() {
 		if(!$.cookie("user-id")) {
 			var id = Math.random().toString().substr(2);
 			$.cookie("user-id", id);
+		} else {
+
 		}
 		ws.send("registration", $.cookie("user-id"));
 		ws.send("ready", {
@@ -58,5 +70,8 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		$("#window-win").removeClass("fadeInDown");
 		$("#window-win").addClass("fadeOut");
 		$("#window-win").css({zIndex: -1000});
+	});
+	$("#ok-button").on("click", function() {
+		$("#window-welcome").fadeOut();
 	});
 });

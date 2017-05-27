@@ -20,21 +20,25 @@ require(["Player", "WebSocket"], function(Player, WS) {
 	var ws = new WS();
 
 	$("#bot-button").on("click", function() {
-		$("#window-welcome").addClass("fadeOut");
+		$("#window-welcome").addClass("rotateOut");
 		$("#canvas-player").show().addClass("fadeInLeft");
 		$("#canvas-enemy").show().addClass("fadeInRight");
+		setTimeout(function() {
+			$("#canvas-player").removeClass("fadeInLeft").css({"display": "block", "opacity": 1});
+			$("#canvas-enemy").removeClass("fadeInRight").css({"display": "block", "opacity": 1});
+		}, 1000);
 		$("#window-welcome").css({zIndex: -1000});
 
-		player = new Player($("#window-welcome input").val(), 10, 10, {
+		player = new Player(10, 10, {
 			gameType: "BOT",
-		}, "canvas-player");
+		}, "canvas-player", "Вы проиграли!");
 		player.init();
 		player.canAttacked = false;
 		player.generateBoats();
 		player.giveAI();
 
 
-		enemy = new Player("Бот", 10, 10, {
+		enemy = new Player(10, 10, {
 			gameType: "BOT",
 			onFieldClick: function() {
 				player.botAttack();
@@ -43,7 +47,7 @@ require(["Player", "WebSocket"], function(Player, WS) {
 			loss: function() {
 				player.canAttacked = false;
 			}
-		}, "canvas-enemy");
+		}, "canvas-enemy", "Вы выиграли!");
 
 		enemy.init();
 		enemy.drawer.visible = false;
@@ -55,6 +59,7 @@ require(["Player", "WebSocket"], function(Player, WS) {
 			var id = Math.random().toString().substr(2);
 			$.cookie("user-id", id);
 		}
+		$.cookie("creator", true);
 		ws.send("registration", $.cookie("user-id"));
 		ws.send("startgame", $.cookie("user-id"));
 	});
@@ -72,6 +77,7 @@ require(["Player", "WebSocket"], function(Player, WS) {
 		if(canRemove) {
 			player.reset();
 			player.canAttacked = false;
+			canRemove = true;
 		}
 	});
 });

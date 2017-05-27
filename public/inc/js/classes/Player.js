@@ -2,12 +2,12 @@ define(["Boat", "Drawer", "Field", "AI", "WebSocket"], function(Boat, Drawer, Fi
 	const MAX_BOAT_LENGTH = 4;
 
 	return class Player {
-		constructor(name, width, height, observer, selector) {
-			this.name = name;
+		constructor(width, height, observer, selector, message) {
 			this.observer = observer;
 			this.field = new Field(width, height);
 			this.canvas = document.getElementById(selector);
 			this.drawer = new Drawer(this.field, this.canvas);
+			this.message = message;
 			this.canAttacked = true;
 
 			if(this.observer.gameType == "ONLINE") {
@@ -155,6 +155,10 @@ define(["Boat", "Drawer", "Field", "AI", "WebSocket"], function(Boat, Drawer, Fi
 					}
 				}
 			}
+			$(this.canvas).addClass("tada animated");
+			setTimeout((function() {
+				$(this.canvas).removeClass();
+			}).bind(this), 1000);
 		}
 
 		checkLose() {
@@ -164,7 +168,7 @@ define(["Boat", "Drawer", "Field", "AI", "WebSocket"], function(Boat, Drawer, Fi
 				if(this.observer.loss)
 					this.observer.loss();
 				this.canAttacked = false;
-				$("#window-win b").text(this.name);
+				$("#window-win h3").text(this.message);
 				$("#window-win").css({zIndex: 100});
 				$("#window-win").removeClass("fadeOut");
 				$("#window-win").addClass("fadeInDown");

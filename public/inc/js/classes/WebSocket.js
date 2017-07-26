@@ -1,5 +1,5 @@
 define([], function() {
-	const WEBSOCKET = "ws://battleship-dmitry.herokuapp.com:8081";
+	const WEBSOCKET = "ws://battleship-dmitry.herokuapp.com";
 	const URL = "http://battleship-dmitry.herokuapp.com/";
 
 	return class WS {

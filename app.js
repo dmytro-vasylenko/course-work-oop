@@ -1,22 +1,24 @@
-var express = require("express");
-var WebSocket = require("ws");
+const express = require("express");
+const SocketServer = require("ws").Server;
 
-var app = express();
+const PORT = process.env.PORT || 8080;
 
 var clients = {};
 var games = {};
 
-app.use(express.static('public'));
+const server = express()
+	.use(express.static('public'))
+	.listen(PORT, function() {
+		console.log("Server started at port " + PORT);
+	});
 
-var websocket = new WebSocket.Server({
-	port: 8081
-});
+const websocket = new SocketServer({server});
 
-app.get("/", function(req, res) {
+server.get("/", function(req, res) {
 	res.sendFile(__dirname + "/index.html");
 });
 
-app.get("/:id", function(req, res) {
+server.get("/:id", function(req, res) {
 	if(!games[req.params.id])
 		res.redirect("/");
 	else
@@ -113,7 +115,3 @@ function sendData(client, type, data) {
 		data
 	}));
 }
-
-app.listen(process.env.PORT || 8080, function() {
-	console.log("Server started at http://localhost:" + process.env.PORT || 8080);
-});

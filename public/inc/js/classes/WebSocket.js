@@ -1,6 +1,6 @@
 define([], function() {
-	const WEBSOCKET = "ws://localhost:8081";
-	const URL = "http://localhost:3000/";
+	const WEBSOCKET = "ws://battleship-dmitry.herokuapp.com:8081";
+	const URL = "http://battleship-dmitry.herokuapp.com/";
 
 	return class WS {
 		constructor(player, enemy, onload) {

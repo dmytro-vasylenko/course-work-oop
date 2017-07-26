@@ -114,6 +114,6 @@ function sendData(client, type, data) {
 	}));
 }
 
-app.listen(3000, function() {
-	console.log("Server started at http://localhost:3000/");
+app.listen(process.env.PORT || 8080, function() {
+	console.log("Server started at http://localhost:" + process.env.PORT || 8080);
 });

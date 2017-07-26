@@ -6,11 +6,11 @@ const PORT = process.env.PORT || 8080;
 var clients = {};
 var games = {};
 
-const server = express()
-	.use(express.static('public'))
-	.listen(PORT, function() {
-		console.log("Server started at port " + PORT);
-	});
+var server = express();
+server.use(express.static('public'))
+server.listen(PORT, function() {
+	console.log("Server started at port " + PORT);
+});
 
 const websocket = new SocketServer({server});
 

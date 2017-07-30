@@ -1,53 +1,51 @@
 define([], function() {
-	const WEBSOCKET = "wss://battleship-dmitry.herokuapp.com";
-	const URL = "http://battleship-dmitry.herokuapp.com/";
+	const URL = window.location.href;
+
 
 	return class WS {
 		constructor(player, enemy, onload) {
 			this.player = player;
 			this.enemy = enemy;
 			this.onload = onload;
-			this.websocket = new WebSocket(WEBSOCKET);
+			this.socket = io();
 
-			this.websocket.onopen = function() {
-				console.log("Connected to " + WEBSOCKET);
+			this.socket.on("connect", () => {
+				console.log("Connected to Socket.IO!");
 				if(this.onload) {
 					this.onload();
 				}
-			}.bind(this);
+			});
 
-			this.websocket.onmessage = function(message) {
-				message = JSON.parse(message.data);
+			this.socket.on("text", text => {
+				console.log(data);
+			});
 
-				switch(message.type) {
-					case "text":
-						console.log(message.data);
-						break;
-					case "url":
-						window.location = URL + message.data;
-						break;
-					case "field":
-						this.setField(message.data.cells, message.data.boats);
-						break;
-					case "attack":
-						this.player.attack(message.data.x, message.data.y);
-						break;
-					case "attack-state":
-						this.enemy.canAttacked = message.data;
-						if(this.enemy.canAttacked) {
-							$(this.enemy.canvas).css({"box-shadow": "0 0 5px 5px green"});
-							$(this.player.canvas).css({"box-shadow": "none"});
-						} else {
-							$(this.enemy.canvas).css({"box-shadow": "none"});
-							$(this.player.canvas).css({"box-shadow": "0 0 5px 5px red"});
-						}
-						break;
+			this.socket.on("url", id => {
+				window.location = URL + id;
+			});
+
+			this.socket.on("field", data => {
+				this.setField(data.cells, data.boats);
+			});
+
+			this.socket.on("attack", data => {
+				this.player.attack(data.x, data.y);
+			});
+
+			this.socket.on("attack-state", data => {
+				this.enemy.canAttacked = data;
+				if(this.enemy.canAttacked) {
+					$(this.enemy.canvas).css({"box-shadow": "0 0 5px 5px green"});
+					$(this.player.canvas).css({"box-shadow": "none"});
+				} else {
+					$(this.enemy.canvas).css({"box-shadow": "none"});
+					$(this.player.canvas).css({"box-shadow": "0 0 5px 5px red"});
 				}
-			}.bind(this);
+			});
 
-			this.websocket.onclose = function() {
+			this.socket.on("disconnect", () => {
 				console.log("closed...");
-			};
+			});
 		}
 
 		setField(cells, boats) {
@@ -56,10 +54,7 @@ define([], function() {
 		}
 
 		send(type, data) {
-			this.websocket.send(JSON.stringify({
-				type,
-				data
-			}));
+			this.socket.emit(type, data);
 		}
 	}
 });

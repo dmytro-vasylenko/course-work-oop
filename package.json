@@ -19,7 +19,7 @@
   "homepage": "https://github.com/dmytro-vasylenko/course-work-oop#readme",
   "dependencies": {
     "express": "^4.15.2",
-    "socket.io": "^1.7.3",
+    "socket.io": "^1.7.4",
     "ws": "^2.3.1"
   }
 }
